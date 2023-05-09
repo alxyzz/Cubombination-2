@@ -1,18 +1,27 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
-//using System.Drawing;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 public class Module : MonoBehaviour
 {
     public bool isSolved = false;
     [SerializeField] private bool isWaiting = false;
-    [SerializeField] private float waitDuration = 10f;
+    float waitDuration;
+    [SerializeField] UnityEvent doOnActivation;
+    [SerializeField] UnityEvent doOnFulfillment;
 
     [SerializeField] Color activeColor;
     [SerializeField] Color inactiveColor;
+
+    Image selfImage;
+
+    void Start()
+    {
+        selfImage = GetComponent<Image>();
+    }
 
     private void Update()
     {
@@ -26,9 +35,9 @@ public class Module : MonoBehaviour
     {
         isWaiting = true;
         isSolved = true;
-        this.GetComponent<Image>().color = inactiveColor;
+        selfImage.color = inactiveColor;
         yield return new WaitForSeconds(10f); // Wait for 10 seconds
-        this.GetComponent<Image>().color = activeColor;
+        selfImage.color = activeColor;
         isSolved = false;
         isWaiting = false;
     }

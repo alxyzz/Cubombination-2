@@ -9,6 +9,26 @@ public class ArduinoIO : MonoBehaviour
 {
     private static ArduinoIO instance;
     public Dictionary<string, object> sensorData;
+
+    public float _Distance
+    {
+        get
+        {
+            return distance;
+        }
+    }
+    float distance = 0;
+    private SerialPort serialPort;
+    public SerialPort _SerialPort
+    {
+        get
+        {
+            return serialPort;
+        }
+    }
+  
+
+
     //Getter for the instance
     public static ArduinoIO Instance
     {
@@ -36,9 +56,7 @@ public class ArduinoIO : MonoBehaviour
     }
 
 
-    private SerialPort serialPort;
 
-    int distance;
 
     private void Awake()
     {
@@ -55,47 +73,93 @@ public class ArduinoIO : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        serialPort = new SerialPort("COM4", 9600);
+        serialPort = new SerialPort("COM6", 9600);
         serialPort.Open();
     }
 
     // Update is called once per frame
     void Update()
     {
+        
         string data = serialPort.ReadLine();
         string[] keyValuePairs = data.Split(',');
-        foreach (string keyValuePair in keyValuePairs)
-        {
-            // Split the key-value pair into key, type, and value
-            string[] elements = keyValuePair.Split(':');
-            string key = elements[0];
-            string type = elements[1];
-            string valueString = elements[2];
 
-            // Parse the value based on the type
-            object value;
-            switch (type)
+        try
+        {
+            foreach (string keyValuePair in keyValuePairs)
             {
-                case "f":
-                    value = float.Parse(valueString);
-                    break;
-                case "b":
-                    value = bool.Parse(valueString);
-                    break;
-                default:
-                    Debug.LogWarning("Unknown value type: " + type);
-                    continue;
+                if (string.IsNullOrEmpty(keyValuePair))
+                {
+                    return;
+                }
+
+                string[] elements = keyValuePair.Split(':');
+                string key = elements[0];
+                string type = elements[1];
+                string valueString = elements[2];
+
+                //string b = "";
+                //foreach (var item in elements)
+                //{
+                //    b += item + Environment.NewLine;
+                //}
+
+
+
+
+                // Parse the value based on the type
+                object value;
+                switch (type)
+                {
+                    case "f":
+                        value = float.Parse(valueString);
+                        break;
+                    case "b":
+                        if (valueString == "0")
+                        {
+                            value = false;
+                        }
+                        else
+                        {
+                            value = true;
+                        }
+
+                        break;
+                    case "i":
+                        value = Int32.Parse(valueString);
+                        break;
+                    default:
+                        Debug.LogWarning("Unknown value type: " + type);
+                        continue;
+                }
+
+                // Store the value in the dictionary
+                sensorData[key] = value;
             }
 
-            // Store the value in the dictionary
-            sensorData[key] = value;
         }
-        float sensorValue1 = (float)sensorData["Distance"]; // Convert the first byte to a float
-        float sensorValue2 = (float)sensorData["Duration"];
+        catch (Exception)
+        {
 
-        //message = serialPort.ReadLine();
-        //distance = Int32.Parse(message);
-        Debug.Log(sensorValue1+ ", " + sensorValue2);
-        //Debug.Log(data);
+            throw;
+        }
+
+
+        
+        try
+        {
+            distance = (float)sensorData["distance"]; // Convert the first byte to a float
+            bool touch = (bool)sensorData["touchStatus"]; // Convert the first byte to a float
+            int brightness = (int)sensorData["brightnessValue"]; // Convert the first byte to a float
+            //Debug.Log(distance + " is the distance");
+            Debug.Log(touch + " is the touch");
+            //Debug.Log(brightness + " is the brightness");
+        }
+        catch (Exception)
+        {
+
+        }
+        
+
     }
 }
