@@ -28,17 +28,6 @@ public class UpdateIfTouch : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (arduinoTouch)
-        {
-            ArduinoIO.Instance._SerialPort.Write("L");
-        }
-        else
-        {
-            ArduinoIO.Instance._SerialPort.Write(" ");
-
-        }
-
-        Debug.Log(arduinoTouch + " is the value of arduinoTouch");
         selfimage.enabled = arduinoTouch;
     }
 }

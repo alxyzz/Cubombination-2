@@ -25,7 +25,6 @@ public class ModuleDistance : MonoBehaviour
     [SerializeField] TextMeshProUGUI txt_TargetDistance;
     [SerializeField] TextMeshProUGUI txt_ValidationCountdown;
     [SerializeField] TextMeshProUGUI txt_TimeToExplode;
-    float timeToExplode;
     float currentTime;
 
     [SerializeField] float HandMovementFactor;
@@ -41,7 +40,7 @@ public class ModuleDistance : MonoBehaviour
     void Start()
     {
         // Debug.LogError("TEST");
-        timeToExplode = GameManager.Instance.SETTING_DISTANCE_TIME_TO_EXPLODE;
+        currentTime = GameManager.Instance.SETTING_DISTANCE_TIME_TO_EXPLODE;
         Init();
     }
 
@@ -114,10 +113,9 @@ public class ModuleDistance : MonoBehaviour
 
         void UpdateTiming()
         {
-            currentTime += Time.deltaTime;
-            if (currentTime >= timeToExplode)
+            currentTime -= Time.deltaTime;
+            if (currentTime <= 0)
             {
-
                 GameManager.Instance.Explode();
             }
             txt_TimeToExplode.text = currentTime.ToString("F");
@@ -137,8 +135,6 @@ public class ModuleDistance : MonoBehaviour
             else
             {
                 txt_ValidationCountdown.gameObject.SetActive(false);
-                txt_TimeToExplode.gameObject.SetActive(true);
-                txt_TimeToExplode.text = timeLeftToExplosion.ToString("F");
             }
             
         }
@@ -248,13 +244,13 @@ public class ModuleDistance : MonoBehaviour
     {
         timeLeftToExplosion = GameManager.Instance.SETTING_DISTANCE_TIME_TO_EXPLODE;
         SweetSpot = Random.Range(1, maxRecognizedDistanceFromCube);
-
         Debug.LogWarning("Generated random sweet spot for the distance module.");
         txt_TargetDistance.text = SweetSpot.ToString();
+        _state = MDState.Playing;
     }
-   
 
-   
+
+
 
     #endregion
 

@@ -8,7 +8,6 @@ public class ModuleTouch : MonoBehaviour
 {
     [SerializeReference] TextMeshProUGUI txt_TimeToExplode;
     float currentTime;
-    float timeToExplode;
 
     public enum MPState
     {
@@ -34,9 +33,15 @@ public class ModuleTouch : MonoBehaviour
     float secondsLeftTillValidation;
     void Start()
     {
-        StartCooldown();
-        txt_GoalSecondsTouched.text = GameManager.Instance.SETTING_TOUCH_SECONDS_TO_TOUCH.ToString();
+       // StartCooldown();
 
+
+
+        txt_GoalSecondsTouched.text = GameManager.Instance.SETTING_TOUCH_SECONDS_TO_TOUCH.ToString();
+        currentTime = GameManager.Instance.SETTING_TOUCH_TIME_TO_EXPLODE;
+        txt_CurrentSecondsTouched.text = GameManager.Instance.SETTING_TOUCH_SECONDS_TO_TOUCH.ToString();
+        warning.Begin();
+        RandomlyChooseBetweenHotOrCold();
     }
 
     private IEnumerator StartCooldown()
@@ -72,7 +77,7 @@ public class ModuleTouch : MonoBehaviour
             }
         }
         else if (_state == MPState.Cold)
-            _state = MPState.RedHot;
+            _state = MPState.Cold; //formerly hot
         foreach (var item in wires)
         {
             item.color = hotwire;
@@ -109,12 +114,12 @@ public class ModuleTouch : MonoBehaviour
         Debug.LogWarning("RandomlyChooseBetweenHotOrCold.b was "+ b.ToString());
         if (b > 4)
         {
-            _state = MPState.RedHot;
-            foreach (var item in wires)
-            {
-                item.color = hotwire;
-            }
-            Debug.LogWarning("Randomly picked to be ");
+            _state = MPState.Cold;
+            ////foreach (var item in wires)
+            ////{
+            ////    item.color = hotwire;
+            ////}
+           // Debug.LogWarning("Randomly picked to be ");
 
         }
         else
@@ -176,8 +181,8 @@ public class ModuleTouch : MonoBehaviour
 
 
 
-        currentTime += Time.deltaTime;
-        if (currentTime >= timeToExplode)
+        currentTime -= Time.deltaTime;
+        if (currentTime <= 0)
         {
 
             GameManager.Instance.Explode();

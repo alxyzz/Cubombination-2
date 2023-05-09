@@ -6,6 +6,10 @@ using UnityEngine.Rendering.PostProcessing;
 
 public class GameManager : MonoBehaviour
 {
+
+    [SerializeReference] GameObject Losegame;
+
+
     #region singleton
     [HideInInspector]
     public static GameManager Instance
@@ -61,9 +65,9 @@ public class GameManager : MonoBehaviour
     public float SETTING_LIGHT_SECONDS_TO_CORRECTLY_INTERACT_WITH; //time we need to work on the module to make it cool down
     public float SETTING_TOUCH_SECONDS_TO_TOUCH; //time we need to work on the module to make it cool down
 
-    public float SETTING_DISTANCE_TIME_TO_EXPLODE; //time we need to work on the module to make it cool down
-    public float SETTING_LIGHT_TIME_TO_EXPLODE; //time we need to work on the module to make it cool down
-    public float SETTING_TOUCH_TIME_TO_EXPLODE; //time we need to work on the module to make it cool down
+    public float SETTING_DISTANCE_TIME_TO_EXPLODE; //time until explosion
+    public float SETTING_LIGHT_TIME_TO_EXPLODE;//time until explosion
+    public float SETTING_TOUCH_TIME_TO_EXPLODE; //time until explosion
 
     public float SETTING_TOUCH_MIN_TEMPCHANGE_INTERVAL = 1;  //time we need to work on the module to make it cool down
     public float SETTING_TOUCH_MAX_TEMPCHANGE_INTERVAL = 5; //time we need to work on the module to make it cool down
@@ -91,11 +95,11 @@ public class GameManager : MonoBehaviour
 
     public void Explode()
     {
-
+        Debug.LogError("Exploded.");
         md._state = ModuleDistance.MDState.Paused;
        // ml._state = paused;
         MyPerc._state  = ModuleTouch.MPState.Paused;
-
+        Losegame.SetActive(true);
 
     }
 
@@ -106,10 +110,11 @@ public class GameManager : MonoBehaviour
 
 
 
-        //if (md._state != ModuleDistance.MDState.Waiting && MyPerc._state != ModuleTouch.MPState.Waiting)
-        //{
-        //    ArduinoIO.Instance._SerialPort.Write("L");
-        //}
+        if (md._state != ModuleDistance.MDState.Waiting && MyPerc._state != ModuleTouch.MPState.Waiting)
+        {
+            Debug.LogWarning("Both modules are unpaused. Light should light up.");
+            ArduinoIO.Instance._SerialPort.Write("L");
+        }
 
     }
     
